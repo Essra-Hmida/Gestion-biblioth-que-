@@ -1,6 +1,7 @@
 from .models import Livre, Utilisateur, Emprunt
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.hashers import make_password, check_password
 import json
 
 def get_livres(request):
@@ -25,66 +26,112 @@ def get_livre(request, id):
 @csrf_exempt
 def add_livre(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        
-        # Vérifier si un livre avec le même ISBN existe déjà
-        if Livre.objects.filter(isbn=data.get('isbn')).exists():
-            return JsonResponse({"error": "Un livre avec ce ISBN existe déjà."}, status=400)
+        try:
+            data = json.loads(request.body)
 
-        livre = Livre.objects.create(
-            titre=data.get('titre'),
-            auteur=data.get('auteur'),
-            isbn=data.get('isbn'),
-            genre=data.get('genre'),
-            emplacement=data.get('emplacement'),
-            disponible=data.get('disponible')
-        )
+            # Vérifier si l'utilisateur demandeur est un administrateur
+            requester_id = data.get("requester_id")  # ID de l'utilisateur demandeur
+            try:
+                requester = Utilisateur.objects.get(id=requester_id)
+                if not requester.is_admin:
+                    return JsonResponse({"error": "Permission refusée : seuls les administrateurs peuvent ajouter un livre."}, status=403)
+            except Utilisateur.DoesNotExist:
+                return JsonResponse({"error": "Utilisateur demandeur non trouvé."}, status=404)
 
-        return JsonResponse({
-            "id": livre.id,
-            "titre": livre.titre,
-            "auteur": livre.auteur,
-            "isbn": livre.isbn,
-            "genre": livre.genre,
-            "emplacement": livre.emplacement,
-            "disponible": livre.disponible
-        }, status=201)
+            # Ajouter le livre
+            livre = Livre.objects.create(
+                titre=data.get("titre"),
+                auteur=data.get("auteur"),
+                isbn=data.get("isbn"),
+                genre=data.get("genre"),
+                emplacement=data.get("emplacement"),
+                disponible=data.get("disponible", True)
+            )
+
+            return JsonResponse({
+                "id": livre.id,
+                "titre": livre.titre,
+                "auteur": livre.auteur,
+                "isbn": livre.isbn,
+                "genre": livre.genre,
+                "emplacement": livre.emplacement,
+                "disponible": livre.disponible
+            }, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Requête invalide, données JSON attendues."}, status=400)
+
 
 @csrf_exempt
 def update_livre(request, id):
     if request.method == "PUT":
-        data = json.loads(request.body)
         try:
-            livre = Livre.objects.get(id=id)
-        except Livre.DoesNotExist:
-            return JsonResponse({"error": "Livre non trouvé"}, status=404)
-        
-        livre.titre = data.get('titre', livre.titre)
-        livre.auteur = data.get('auteur', livre.auteur)
-        livre.isbn = data.get('isbn', livre.isbn)
-        livre.genre = data.get('genre', livre.genre)
-        livre.emplacement = data.get('emplacement', livre.emplacement)
-        livre.disponible = data.get('disponible', livre.disponible)
-        livre.save()
+            data = json.loads(request.body)
 
-        return JsonResponse({
-            "id": livre.id,
-            "titre": livre.titre,
-            "auteur": livre.auteur,
-            "isbn": livre.isbn,
-            "genre": livre.genre,
-            "emplacement": livre.emplacement,
-            "disponible": livre.disponible
-        })
+            # Vérifier si l'utilisateur demandeur est un administrateur
+            requester_id = data.get("requester_id")  # ID de l'utilisateur demandeur
+            try:
+                requester = Utilisateur.objects.get(id=requester_id)
+                if not requester.is_admin:
+                    return JsonResponse({"error": "Permission refusée : seuls les administrateurs peuvent modifier un livre."}, status=403)
+            except Utilisateur.DoesNotExist:
+                return JsonResponse({"error": "Utilisateur demandeur non trouvé."}, status=404)
+
+            # Rechercher le livre à mettre à jour
+            try:
+                livre = Livre.objects.get(id=id)
+            except Livre.DoesNotExist:
+                return JsonResponse({"error": "Livre non trouvé."}, status=404)
+
+            # Mettre à jour les champs du livre
+            livre.titre = data.get("titre", livre.titre)
+            livre.auteur = data.get("auteur", livre.auteur)
+            livre.isbn = data.get("isbn", livre.isbn)
+            livre.genre = data.get("genre", livre.genre)
+            livre.emplacement = data.get("emplacement", livre.emplacement)
+            livre.disponible = data.get("disponible", livre.disponible)
+            livre.save()
+
+            return JsonResponse({
+                "message": "Livre mis à jour avec succès.",
+                "id": livre.id,
+                "titre": livre.titre,
+                "auteur": livre.auteur,
+                "isbn": livre.isbn,
+                "genre": livre.genre,
+                "emplacement": livre.emplacement,
+                "disponible": livre.disponible
+            }, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Requête invalide, données JSON attendues."}, status=400)
+
 @csrf_exempt
 def delete_livre(request, id):
     if request.method == "DELETE":
         try:
-            livre = Livre.objects.get(id=id)
-            livre.delete()
-            return JsonResponse({"message": "Livre supprimé avec succès"}, status=204)
-        except Livre.DoesNotExist:
-            return JsonResponse({"error": "Livre non trouvé"}, status=404)
+            data = json.loads(request.body)
+
+            # Vérifier si l'utilisateur demandeur est un administrateur
+            requester_id = data.get("requester_id")  # ID de l'utilisateur demandeur
+            try:
+                requester = Utilisateur.objects.get(id=requester_id)
+                if not requester.is_admin:
+                    return JsonResponse({"error": "Permission refusée : seuls les administrateurs peuvent supprimer un livre."}, status=403)
+            except Utilisateur.DoesNotExist:
+                return JsonResponse({"error": "Utilisateur demandeur non trouvé."}, status=404)
+
+            # Rechercher le livre à supprimer
+            try:
+                livre = Livre.objects.get(id=id)
+                livre.delete()
+                return JsonResponse({"message": "Livre supprimé avec succès."}, status=200)
+            except Livre.DoesNotExist:
+                return JsonResponse({"error": "Livre non trouvé."}, status=404)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Requête invalide, données JSON attendues."}, status=400)
+
 def get_utilisateurs(request):
     if request.method == "GET":
         utilisateurs = Utilisateur.objects.all().values()
@@ -101,22 +148,96 @@ def get_utilisateur(request, id):
             })
         except Utilisateur.DoesNotExist:
             return JsonResponse({"error": "Utilisateur non trouvé"}, status=404)
+#@csrf_exempt
+#def add_utilisateur(request):
+#    if request.method == "POST":
+#        data = json.loads(request.body)
+#        utilisateur = Utilisateur.objects.create(
+#            username=data.get('username'),
+#            password=data.get('password'),
+#           email=data.get('email'),
+#            date_creation=data.get('date_creation')
+#        )
+#        return JsonResponse({
+#            "id": utilisateur.id,
+#            "username": utilisateur.username,
+#            "email": utilisateur.email,
+#            "date_creation": utilisateur.date_creation
+#        }, status=201)
 @csrf_exempt
-def add_utilisateur(request):
+def sign_up(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        utilisateur = Utilisateur.objects.create(
-            username=data.get('username'),
-            password=data.get('password'),
-            email=data.get('email'),
-            date_creation=data.get('date_creation')
-        )
-        return JsonResponse({
-            "id": utilisateur.id,
-            "username": utilisateur.username,
-            "email": utilisateur.email,
-            "date_creation": utilisateur.date_creation
-        }, status=201)
+        try:
+            data = json.loads(request.body)
+
+            # Récupérer les champs nécessaires
+            username = data.get("username")
+            password = data.get("password")
+            email = data.get("email")
+
+            # Vérifier si les champs sont présents
+            if not username or not password or not email:
+                return JsonResponse({"error": "Tous les champs sont obligatoires."}, status=400)
+
+            # Vérifier si l'utilisateur ou l'email existent déjà
+            if Utilisateur.objects.filter(username=username).exists():
+                return JsonResponse({"error": "Ce nom d'utilisateur est déjà pris."}, status=400)
+
+            if Utilisateur.objects.filter(email=email).exists():
+                return JsonResponse({"error": "Cet email est déjà utilisé."}, status=400)
+
+            # Créer un utilisateur normal (non administrateur)
+            utilisateur = Utilisateur.objects.create(
+                username=username,
+                password=password,
+                email=email,
+                is_admin=False  # Par défaut, les utilisateurs ne sont pas administrateurs
+            )
+
+            return JsonResponse({
+                "message": "Inscription réussie",
+                "id": utilisateur.id,
+                "username": utilisateur.username,
+                "email": utilisateur.email
+            }, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Requête invalide, données JSON attendues."}, status=400)
+
+@csrf_exempt
+def sign_in(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+
+            # Récupérer les données d'authentification
+            username = data.get("username")
+            password = data.get("password")
+
+            # Vérifier si l'utilisateur existe
+            try:
+                utilisateur = Utilisateur.objects.get(username=username)
+
+                # Vérifier le mot de passe
+                if check_password(password, utilisateur.password):
+                    return JsonResponse({
+                        "message": "Connexion réussie.",
+                        "utilisateur": {
+                            "id": utilisateur.id,
+                            "username": utilisateur.username,
+                            "email": utilisateur.email
+                        }
+                    }, status=200)
+                else:
+                    return JsonResponse({"error": "Mot de passe incorrect."}, status=400)
+
+            except Utilisateur.DoesNotExist:
+                return JsonResponse({"error": "Utilisateur non trouvé."}, status=404)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Données JSON invalides."}, status=400)
+    else:
+        return JsonResponse({"error": "Méthode non autorisée."}, status=405)
 @csrf_exempt
 def update_utilisateur(request, id):
     if request.method == "PUT":
@@ -253,5 +374,34 @@ def delete_emprunt(request, id):
             return JsonResponse({"message": "Emprunt supprimé avec succès"}, status=204)
         except Emprunt.DoesNotExist:
             return JsonResponse({"error": "Emprunt non trouvé"}, status=404)
+@csrf_exempt
+def promote_to_admin(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+
+            # Vérifier si l'utilisateur demandeur est un superutilisateur
+            requester_id = data.get("requester_id")  # ID de l'utilisateur demandeur
+            try:
+                requester = Utilisateur.objects.get(id=requester_id)
+                if not requester.is_admin:  # Vérifie si l'utilisateur est administrateur
+                    return JsonResponse({"error": "Permission refusée."}, status=403)
+            except Utilisateur.DoesNotExist:
+                return JsonResponse({"error": "Demandeur non trouvé."}, status=404)
+
+            # Promouvoir l'utilisateur cible
+            user_id = data.get("user_id")  # ID de l'utilisateur à promouvoir
+            try:
+                user = Utilisateur.objects.get(id=user_id)
+                user.is_admin = True
+                user.save()
+
+                return JsonResponse({"message": f"L'utilisateur {user.username} a été promu administrateur avec succès."}, status=200)
+            except Utilisateur.DoesNotExist:
+                return JsonResponse({"error": "Utilisateur non trouvé."}, status=404)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Requête invalide, données JSON attendues."}, status=400)
+
 
 
