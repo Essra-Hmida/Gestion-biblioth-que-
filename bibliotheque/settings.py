@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'gestion',
     'rest_framework',
+    'corsheaders',
+
 ]
 
 MIDDLEWARE = [
@@ -49,6 +51,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'bibliotheque.urls'
@@ -127,4 +131,7 @@ CSRF_COOKIE_HTTPONLY = False
 ATOMIC_REQUESTS = True
 
 
+CORS_ALLOWED_ORIGINS = [
+"http://localhost:3000", # Adresse du front-end React
+]
 
