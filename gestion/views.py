@@ -204,40 +204,50 @@ def sign_up(request):
         except json.JSONDecodeError:
             return JsonResponse({"error": "Requête invalide, données JSON attendues."}, status=400)
 
-@csrf_exempt
+@csrf_exempt # Pour permettre les requêtes POST sans vérification CSRF
 def sign_in(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-
             # Récupérer les données d'authentification
             username = data.get("username")
             password = data.get("password")
-
             # Vérifier si l'utilisateur existe
             try:
                 utilisateur = Utilisateur.objects.get(username=username)
-
                 # Vérifier le mot de passe
                 if check_password(password, utilisateur.password):
-                    return JsonResponse({
-                        "message": "Connexion réussie.",
-                        "utilisateur": {
-                            "id": utilisateur.id,
-                            "username": utilisateur.username,
-                            "email": utilisateur.email
-                        }
-                    }, status=200)
+                # Vérification du rôle administrateur
+                    if utilisateur.is_admin:
+                        return JsonResponse({
+                            "message": "Connexion réussie (Admin).",
+                            "redirect_to": "/admin-dashboard", # Indiquer la redirection
+                            "utilisateur": {
+                                "id": utilisateur.id,
+                                "username": utilisateur.username,
+                                "email": utilisateur.email,
+                                "is_admin": utilisateur.is_admin
+                            }
+                        }, status=200)
+                    else:
+                        return JsonResponse({
+                            "message": "Connexion réussie (Utilisateur).",
+                            "redirect_to": "/book-list", # Indiquerla redirection
+                            "utilisateur": {
+                                "id": utilisateur.id,
+                                "username": utilisateur.username,
+                                "email": utilisateur.email,
+                                "is_admin": utilisateur.is_admin
+                            }
+                        }, status=200)
                 else:
                     return JsonResponse({"error": "Mot de passe incorrect."}, status=400)
-
             except Utilisateur.DoesNotExist:
                 return JsonResponse({"error": "Utilisateur non trouvé."}, status=404)
-
         except json.JSONDecodeError:
             return JsonResponse({"error": "Données JSON invalides."}, status=400)
     else:
-        return JsonResponse({"error": "Méthode non autorisée."}, status=405)
+        return JsonResponse({"error": "Méthode non autorisée."},status=405)
 @csrf_exempt
 def update_utilisateur(request, id):
     if request.method == "PUT":
