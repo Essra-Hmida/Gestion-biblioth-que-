@@ -189,7 +189,7 @@ def sign_up(request):
             # Créer un utilisateur normal (non administrateur)
             utilisateur = Utilisateur.objects.create(
                 username=username,
-                password=password,
+                password=make_password(password),
                 email=email,
                 is_admin=False  # Par défaut, les utilisateurs ne sont pas administrateurs
             )
@@ -216,7 +216,7 @@ def sign_in(request):
             try:
                 utilisateur = Utilisateur.objects.get(username=username)
                 # Vérifier le mot de passe
-                if check_password(password, utilisateur.password):
+                if check_password(password,utilisateur.password):
                 # Vérification du rôle administrateur
                     if utilisateur.is_admin:
                         return JsonResponse({
