@@ -22,7 +22,9 @@ urlpatterns = [
     # Emprunt URLs
     path('api/emprunts', views.get_emprunts, name='get_emprunts'),
     path('api/emprunts/<int:id>', views.get_emprunt, name='get_emprunt'),
+    path('api/emprunts_user/<int:id>', views.get_emprunts_by_utilisateur, name='get_emprunts_by_utilisateur'),
     path('api/emprunts/add', views.add_emprunt, name='add_emprunt'),
     path('api/emprunts/<int:id>', views.update_emprunt, name='update_emprunt'),
     path('api/emprunts/<int:id>/delete', views.delete_emprunt, name='delete_emprunt'),
+
 ]

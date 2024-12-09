@@ -288,13 +288,32 @@ def get_emprunt(request, id):
             emprunt = Emprunt.objects.get(id=id)
             return JsonResponse({
                 "id": emprunt.id,
-                "livre": emprunt.livre.titre,
+                "livre__titre": emprunt.livre.titre,
                 "utilisateur": emprunt.utilisateur.username,
                 "date_emprunt": emprunt.date_emprunt,
                 "date_retour": emprunt.date_retour
             })
         except Emprunt.DoesNotExist:
             return JsonResponse({"error": "Emprunt non trouvé"}, status=404)
+def get_emprunts_by_utilisateur(request, id):
+    if request.method == "GET":
+        try:
+            # Vérifier si l'utilisateur existe
+            utilisateur = Utilisateur.objects.get(id=id)
+            
+            # Récupérer les emprunts liés à cet utilisateur
+            emprunts = Emprunt.objects.filter(utilisateur=utilisateur).values(
+                "id", 
+                "livre", 
+                "date_emprunt", 
+                "date_retour"
+            )
+            
+            # Retourner la liste des emprunts sous forme de JSON
+            return JsonResponse(list(emprunts), safe=False, status=200)
+
+        except Utilisateur.DoesNotExist:
+            return JsonResponse({"error": "Utilisateur non trouvé"}, status=404)
 
 @csrf_exempt
 def add_emprunt(request):
