@@ -1,0 +1,91 @@
+/* Reset CSS pour s'assurer que tout commence à zéro */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #E5EEF1; /* Fond de la page */
+    font-family: 'Arial', sans-serif;
+}
+
+/* Style principal de la page de connexion */
+.signin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Prend la hauteur totale de la fenêtre */
+    padding: 20px;
+    background: #ffffff; /* Fond blanc pour le formulaire */
+    border-radius: 10px; /* Coins arrondis */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Ombre douce */
+    max-width: 400px; /* Largeur maximum du formulaire */
+    margin: auto; /* Centre le formulaire horizontalement */
+}
+
+/* Style du titre */
+.signin h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+/* Style des champs d'entrée */
+.signin input {
+    width: 100%; /* Prend toute la largeur du conteneur */
+    padding: 12px 15px; /* Espace interne */
+    margin-bottom: 15px; /* Marge entre les champs */
+    border: 1px solid #ccc; /* Bordure grise */
+    border-radius: 5px; /* Coins arrondis pour les champs */
+    font-size: 16px;
+}
+
+/* Style des boutons */
+.signin button {
+    width: 100%; /* Prend toute la largeur du conteneur */
+    padding: 12px; /* Espace interne */
+    margin-bottom: 10px; /* Marge entre les boutons */
+    border: none; /* Pas de bordure par défaut */
+    border-radius: 5px; /* Coins arrondis */
+    cursor: pointer; /* Pointeur en survol */
+    font-size: 16px;
+    transition: background-color 0.3s; /* Transition pour le survol */
+}
+
+.signin button:first-child {
+    background-color: #5C84C5; /* Couleur du bouton de connexion */
+    color: white; /* Couleur du texte */
+}
+
+.signin button:first-child:hover {
+    background-color: #4f6f9a; /* Couleur au survol */
+}
+
+.signin button:last-child {
+    background-color: transparent; /* Transparent pour le bouton d'inscription */
+    color: #5C84C5; /* Couleur du texte */
+    border: 1px solid #5C84C5; /* Bordure Correspondante */
+}
+
+.signin button:last-child:hover {
+    background-color: #5C84C5; /* Couleur au survol */
+    color: white; /* Couleur du texte au survol */
+}
+
+/* Style du lien d'inscription */
+.signin p {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #777; /* Couleur de texte secondaire */
+}
+
+.signin p a {
+    color: #5C84C5; /* Couleur du lien */
+    text-decoration: none; /* Pas de soulignement */
+}
+
+.signin p a:hover {
+    text-decoration: underline; /* Soulignement au survol */
+}

@@ -1,0 +1,57 @@
+.user-profile-page {
+  background-color: #f4faff; /* Fond spécifique à la page du profil */
+  min-height: 100vh; /* S'assure que la page occupe toute la hauteur */
+}
+
+.user-profile-container {
+  padding: 20px;
+}
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.top-nav h2 {
+  margin-left: 10px;
+}
+
+.book-cards {
+  display: flex; /* Utilisation de Flexbox */
+  gap: 20px; /* Espacement entre les cartes */
+  flex-wrap: wrap; /* Les cartes passent à la ligne si l'espace est insuffisant */
+  justify-content: center; /* Centre les cartes horizontalement */
+  padding: 20px;
+}
+
+.book-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  flex: 0 1 200px; /* Limite la taille des cartes */
+  transition: transform 0.2s; /* Animation au survol */
+}
+
+.book-card:hover {
+  transform: scale(1.05); /* Effet d'agrandissement au survol */
+}
+
+.book-card h3 {
+  margin: 0 0 10px;
+}
+
+.status {
+  font-weight: bold;
+  color: #f39c12; /* Par défaut */
+}
+
+.status.late {
+  color: #e74c3c; /* Couleur pour les retards */
+}
+
+.status.on-time {
+  color: #2ecc71; /* Couleur pour les livres à rendre */
+}
