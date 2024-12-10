@@ -1,0 +1,75 @@
+/* Conteneur principal */
+.home {  
+  display: flex;  
+  flex-direction: row; /* Texte et image côte à côte */  
+  align-items: center;  
+  justify-content: space-around;  
+  height: 100vh;  
+  background: #ffffff; /* Arrière-plan clair */  
+  padding: 20px;  
+  font-family: 'Arial', sans-serif;  
+  color: #333; /* Texte en noir pour un bon contraste */  
+}   
+
+/* Conteneur pour le texte */
+.text-container {  
+  max-width: 40%; /* Réduire la largeur pour mieux gérer l'espace */  
+  text-align: left;  
+}  
+
+/* Image */
+.hero-image {  
+  max-width: 60%;  
+  height: auto;  
+}  
+
+/* Titre principal */
+h1 {  
+  font-size: 3rem;  
+  color: #5C84C5; /* Bleu pour attirer l'attention */  
+  margin-bottom: 20px;  
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);  
+}  
+
+/* Paragraphe */
+p {  
+  font-size: 1.5rem;  
+  color: #555; /* Texte neutre */  
+  margin-bottom: 30px;  
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);  
+}  
+
+/* Bouton */
+button {  
+  background-color: #3498db;   
+  color: white;  
+  border: none;  
+  padding: 15px 30px;  
+  border-radius: 25px;  
+  font-size: 1.2rem;  
+  cursor: pointer;  
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;  
+}  
+
+/* Interaction bouton */
+button:hover {  
+  background-color: #2980b9;   
+  transform: scale(1.05);  
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);  
+}  
+
+/* Responsivité pour les écrans mobiles */
+@media (max-width: 768px) {  
+  .home {  
+      flex-direction: column; /* Réorganiser les éléments en colonne */  
+      text-align: center;  
+  }  
+
+  .text-container, .hero-image {  
+      max-width: 90%; /* Réduire la largeur sur mobile */  
+  }  
+
+  .hero-image {  
+      margin-top: 20px;  
+  }  
+}  

@@ -1,0 +1,110 @@
+/* BookListPage.css */
+body {  
+    background-color: #E5EEF1; /* Applique la couleur de fond à tout le corps */  
+    margin: 0;  
+}
+/* Style global du conteneur */
+.booklist-container {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* Style de la barre de navigation en haut */
+  .top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .top-nav h2 {
+    margin: 0;
+    font-size: 24px;
+  }
+  
+  
+  .search-bar {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 20px 0;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .book-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  
+  .book-card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 250px;
+    margin: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+  
+  .book-card:hover {
+    transform: translateY(-10px);
+  }
+  
+  .book-card h3 {
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .availability {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  
+  .availability.available {
+    color: #5C84C5;
+  }
+  
+  .availability.unavailable {
+    color: #5C84C5;
+  }
+  
+  button {
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .borrow-btn {
+    background-color: #5C84C5;
+    color: white;
+  }
+  
+  .borrow-btn:hover {
+    background-color: #5C84C5;
+  }
+  
+  .reserve-btn {
+    background-color: #5C84C5;
+    color: white;
+  }
+  
+  .reserve-btn:hover {
+    background-color: #5C84C5;
+  }
+
+  
+  
