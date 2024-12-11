@@ -12,7 +12,7 @@ urlpatterns = [
     # Utilisateur URLs
     path('api/utilisateurs', views.get_utilisateurs, name='get_utilisateurs'),
     path('api/utilisateurs/<int:id>', views.get_utilisateur, name='get_utilisateur'),
-    #path('api/utilisateurs/add', views.add_utilisateur, name='add_utilisateur'),
+    path('api/utilisateurs/add', views.add_utilisateur, name='add_utilisateur'),
     path('api/utilisateurs/<int:id>', views.update_utilisateur, name='update_utilisateur'),
     path('api/utilisateurs/<int:id>/delete', views.delete_utilisateur, name='delete_utilisateur'),
     path('api/sign-up', views.sign_up, name='sign_up'),

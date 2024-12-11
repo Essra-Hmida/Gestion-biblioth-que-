@@ -148,22 +148,37 @@ def get_utilisateur(request, id):
             })
         except Utilisateur.DoesNotExist:
             return JsonResponse({"error": "Utilisateur non trouvé"}, status=404)
-#@csrf_exempt
-#def add_utilisateur(request):
-#    if request.method == "POST":
-#        data = json.loads(request.body)
-#        utilisateur = Utilisateur.objects.create(
-#            username=data.get('username'),
-#            password=data.get('password'),
-#           email=data.get('email'),
-#            date_creation=data.get('date_creation')
-#        )
-#        return JsonResponse({
-#            "id": utilisateur.id,
-#            "username": utilisateur.username,
-#            "email": utilisateur.email,
-#            "date_creation": utilisateur.date_creation
-#        }, status=201)
+@csrf_exempt
+def add_utilisateur(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+
+            # Vérifier si l'utilisateur demandeur est un administrateur
+            requester_id = data.get("requester_id")  # ID de l'utilisateur demandeur
+            try:
+                requester = Utilisateur.objects.get(id=requester_id)
+                if not requester.is_admin:  # Vérifie si l'utilisateur est administrateur
+                    return JsonResponse({"error": "Permission refusée. Seuls les administrateurs peuvent ajouter des utilisateurs."}, status=403)
+            except Utilisateur.DoesNotExist:
+                return JsonResponse({"error": "Demandeur non trouvé."}, status=404)
+
+            # Ajouter le nouvel utilisateur
+            utilisateur = Utilisateur.objects.create(
+                username=data.get('username'),
+                password=data.get('password'),
+                email=data.get('email'),
+                is_admin=data.get('is_admin')
+            )
+            return JsonResponse({
+                "id": utilisateur.id,
+                "username": utilisateur.username,
+                "email": utilisateur.email,
+                "is_admin": utilisateur.is_admin
+            }, status=201)
+        
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Requête invalide, données JSON attendues."}, status=400)
 @csrf_exempt
 def sign_up(request):
     if request.method == "POST":
