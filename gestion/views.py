@@ -56,6 +56,9 @@ def update_livre(request, id):
         try:
             data = json.loads(request.body)
 
+            # Log des données reçues
+            print("Données reçues :", data)  # Log des données pour debug
+
             # Rechercher le livre à mettre à jour
             try:
                 livre = Livre.objects.get(id=id)
@@ -251,7 +254,14 @@ def delete_utilisateur(request, id):
             return JsonResponse({"error": "Utilisateur non trouvé"}, status=404)
 def get_emprunts(request):
     if request.method == "GET":
-        emprunts = Emprunt.objects.all().values()
+        # Récupérer les emprunts avec le titre du livre lié
+        emprunts = Emprunt.objects.select_related('livre', 'utilisateur').all().values(
+            'id', 
+            'utilisateur__username',  # On récupère le nom d'utilisateur de l'objet Utilisateur
+            'livre__titre',  # On récupère le titre du livre de l'objet Livre
+            'date_emprunt', 
+            'date_retour'
+        )
         return JsonResponse(list(emprunts), safe=False)
 def get_emprunt(request, id):
     if request.method == "GET":
@@ -393,6 +403,3 @@ def promote_to_admin(request):
 
         except json.JSONDecodeError:
             return JsonResponse({"error": "Requête invalide, données JSON attendues."}, status=400)
-
-
-
